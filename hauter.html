@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lavagem de Dinheiro - Hauter</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
+
+  /* Reset básico */
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Orbitron', sans-serif;
+    background-color: #0b2e0b; /* verde escuro */
+    color: #d4f1d4; /* verde claro */
+    overflow-x: hidden;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: bold;
+    background-image:
+      radial-gradient(circle at 20% 20%, rgba(0, 255, 0, 0.05) 0%, transparent 40%),
+      radial-gradient(circle at 80% 80%, rgba(0, 255, 0, 0.05) 0%, transparent 40%);
+    background-repeat: no-repeat;
+    background-size: 200px 200px;
+  }
+
+  header {
+    background-color: #064006; /* verde mais escuro */
+    padding: 25px;
+    text-align: center;
+    font-size: 32px;
+    color: #7fff7f; /* verde neon */
+    letter-spacing: 3px;
+    text-shadow: 0 0 8px #7fff7f;
+    border-bottom: 3px solid #7fff7f;
+  }
+
+  .container {
+    max-width: 400px;
+    margin: 100px auto 40px;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #123412cc; /* fundo semitransparente verde escuro */
+    border-radius: 15px;
+    box-shadow: 0 0 15px #3aff3a;
+  }
+
+  input, button {
+    width: 100%;
+    max-width: 350px;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: 2px solid #7fff7f;
+    background-color: #0b2e0b;
+    color: #7fff7f;
+    font-weight: bold;
+    font-size: 16px;
+    text-align: center;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    outline: none;
+    transition: border-color 0.3s, background-color 0.3s, color 0.3s;
+  }
+
+  input:focus {
+    border-color: #3aff3a;
+    background-color: #123412;
+    color: #aaffaa;
+  }
+
+  #calculateBtn {
+    background-color: #3aff3a;
+    color: #003300;
+    border: 3px solid #7fff7f;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: 900;
+    text-shadow: 0 0 5px #00ff00;
+    box-shadow: 0 0 10px #3aff3a;
+    transition: background-color 0.3s, color 0.3s;
+  }
+
+  #calculateBtn:hover {
+    background-color: #7fff7f;
+    color: #004d00;
+    box-shadow: 0 0 15px #7fff7f;
+  }
+
+  #receipt {
+    margin-top: 15px;
+    background-color: #0b2e0b;
+    border: 2px solid #7fff7f;
+    padding: 15px;
+    border-radius: 12px;
+    max-width: 350px;
+    text-align: center;
+    color: #aaffaa;
+    font-size: 16px;
+    letter-spacing: 2px;
+    box-shadow: 0 0 10px #3aff3a;
+  }
+
+  /* Painel fixo para histórico e filtro */
+  .history, #filterClientContainer {
+    position: fixed;
+    top: 15px;
+    width: 350px;
+    max-height: 80vh;
+    overflow-y: auto;
+    background-color: rgba(0, 50, 0, 0.95);
+    padding: 15px;
+    border-radius: 12px;
+    border: 2px solid #7fff7f;
+    text-align: center;
+    letter-spacing: 2px;
+    font-weight: bold;
+    color: #aaffaa;
+    box-shadow: 0 0 10px #3aff3a;
+  }
+
+  .history {
+    left: 15px;
+  }
+
+  #filterClientContainer {
+    right: 15px;
+  }
+
+  #filterClient {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 2px solid #7fff7f;
+    margin-bottom: 15px;
+    background-color: #123412;
+    color: #aaffaa;
+    font-size: 15px;
+    font-weight: bold;
+    text-align: center;
+    box-shadow: inset 0 0 5px #3aff3a;
+  }
+
+  .transaction-card {
+    background-color: #145214;
+    border-left: 5px solid #7fff7f;
+    margin: 6px 0;
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 14px;
+    transition: background-color 0.2s;
+    text-align: center;
+    letter-spacing: 2px;
+    color: #caffca;
+    box-shadow: 0 0 5px #3aff3a;
+  }
+
+  .transaction-card:hover {
+    background-color: #1e7a1e;
+    box-shadow: 0 0 10px #7fff7f;
+  }
+
+  /* Painel fixo para capital e caixa */
+  .finance {
+    position: fixed;
+    bottom: 15px;
+    right: 15px;
+    background-color: rgba(0, 50, 0, 0.95);
+    padding: 15px;
+    border-radius: 12px;
+    border: 2px solid #7fff7f;
+    font-size: 16px;
+    width: 220px;
+    text-align: center;
+    letter-spacing: 2px;
+    color: #aaffaa;
+    box-shadow: 0 0 10px #3aff3a;
+  }
+
+  /* Estilos para dólares caindo */
+  .dollar {
+    position: fixed;
+    top: -50px;
+    font-size: 24px;
+    color: #00ff00;
+    user-select: none;
+    pointer-events: none;
+    animation-name: fall, sway;
+    animation-timing-function: linear, ease-in-out;
+    animation-iteration-count: 1, infinite;
+    text-shadow: 0 0 5px #00ff00;
+  }
+
+  @keyframes fall {
+    to {
+      transform: translateY(110vh);
+      opacity: 0;
+    }
+  }
+
+  @keyframes sway {
+    0%, 100% {
+      transform: translateX(0);
+    }
+    50% {
+      transform: translateX(20px);
+    }
+  }
+</style>
+</head>
+<body>
+
+<header>Lavagem de Dinheiro - Hauter</header>
+
+<!-- Container principal com inputs e botão -->
+<div class="container">
+  <input type="text" id="clientName" placeholder="Nome do Cliente" />
+  <input type="number" id="amount" placeholder="Valor Total" min="0" step="0.01" />
+  <input type="number" id="clientPercent" placeholder="% Cliente" value="70" min="0" max="100" />
+  <input type="number" id="companyPercent" placeholder="% Empresa" value="30" min="0" max="100" />
+  <button id="calculateBtn" onclick="calculate()">Calcular</button>
+  <div id="receipt"></div>
+</div>
+
+<!-- Histórico de transações -->
+<div class="history">
+  <h3>Transações</h3>
+  <div id="transactionList"></div>
+</div>
+
+<!-- Filtro por cliente -->
+<div id="filterClientContainer">
+  <h3>Filtrar Cliente</h3>
+  <input type="text" id="filterClient" placeholder="Digite o nome" oninput="filterTransactions()" />
+</div>
+
+<!-- Resumo financeiro -->
+<div class="finance">
+  <h4>Capital: $<span id="capital">0.00</span></h4>
+  <h4>Caixa: $<span id="cash">0.00</span></h4>
+</div>
+
+<!-- Som de dinheiro -->
+<audio id="moneySound" src="https://www.soundjay.com/misc/money-01.mp3"></audio>
+
+<script>
+  // Variáveis globais para armazenar transações e valores financeiros
+  let transactions = [];
+  let capital = 0;
+  let cash = 0;
+
+  function calculate() {
+    const name = document.getElementById('clientName').value.trim() || 'Cliente';
+    const amountInput = document.getElementById('amount').value;
+    const clientPercentInput = document.getElementById('clientPercent').value;
+    const companyPercentInput = document.getElementById('companyPercent').value;
+
+    const amount = parseFloat(amountInput);
+    const clientPercent = parseFloat(clientPercentInput);
+    const companyPercent = parseFloat(companyPercentInput);
+
+    if (isNaN(amount) || amount <= 0) {
+      alert('Por favor, insira um valor total válido maior que zero.');
+      return;
+    }
+    if (isNaN(clientPercent) || isNaN(companyPercent)) {
+      alert('Por favor, insira percentuais válidos.');
+      return;
+    }
+    if (clientPercent < 0 || companyPercent < 0) {
+      alert('Percentuais não podem ser negativos.');
+      return;
+    }
+    if (clientPercent + companyPercent !== 100) {
+      alert('A soma dos percentuais deve ser exatamente 100%.');
+      return;
+    }
+
+    const clientAmount = (amount * clientPercent / 100);
+    const companyAmount = (amount * companyPercent / 100);
+    const remaining = amount - clientAmount - companyAmount;
+
+    capital += companyAmount;
+    cash += clientAmount;
+
+    const now = new Date();
+    const date = now.toLocaleDateString();
+    const time = now.toLocaleTimeString();
+
+    const transaction = {
+      name,
+      amount: amount.toFixed(2),
+      clientAmount: clientAmount.toFixed(2),
+      companyAmount: companyAmount.toFixed(2),
+      remaining: remaining.toFixed(2),
+      date,
+      time
+    };
+
+    transactions.push(transaction);
+
+    updateFinancialDisplay();
+    showReceipt(transaction);
+    updateTransactionList();
+
+    // Toca som de dinheiro
+    const moneySound = document.getElementById('moneySound');
+    moneySound.currentTime = 0;
+    moneySound.play();
+
+    // Inicia animação de dólares caindo
+    startDollarRain();
+  }
+
+  function updateFinancialDisplay() {
+    document.getElementById('capital').innerText = capital.toFixed(2);
+    document.getElementById('cash').innerText = cash.toFixed(2);
+  }
+
+  function showReceipt(transaction) {
+    const receipt = document.getElementById('receipt');
+    receipt.innerHTML = `
+      <h4>Recibo Fictício</h4>
+      <p><strong>Cliente:</strong> ${transaction.name}</p>
+      <p><strong>Total:</strong> $${transaction.amount}</p>
+      <p><strong>Cliente Recebe:</strong> $${transaction.clientAmount}</p>
+      <p><strong>Empresa:</strong> $${transaction.companyAmount}</p>
+      <p><strong>Restante:</strong> $${transaction.remaining}</p>
+      <p><em>${transaction.date} ${transaction.time}</em></p>
+    `;
+  }
+
+  function updateTransactionList(filter = '') {
+    const list = document.getElementById('transactionList');
+    list.innerHTML = '';
+
+    const filterLower = filter.toLowerCase();
+
+    transactions.forEach(t => {
+      if (filterLower === '' || t.name.toLowerCase().includes(filterLower)) {
+        const card = document.createElement('div');
+        card.className = 'transaction-card';
+        card.innerHTML = `
+          <p><strong>Cliente:</strong> ${t.name}</p>
+          <p><strong>Total:</strong> $${t.amount} | <strong>Cliente:</strong> $${t.clientAmount} | <strong>Empresa:</strong> $${t.companyAmount}</p>
+          <p><strong>Restante:</strong> $${t.remaining} <em>${t.date} ${t.time}</em></p>
+        `;
+        list.appendChild(card);
+      }
+    });
+  }
+
+  function filterTransactions() {
+    const filter = document.getElementById('filterClient').value;
+    updateTransactionList(filter);
+  }
+
+  function startDollarRain() {
+    const count = 30;
+    for (let i = 0; i < count; i++) {
+      createDollar(i * 150);
+    }
+  }
+
+  function createDollar(delayMs) {
+    const dollar = document.createElement('div');
+    dollar.classList.add('dollar');
+    dollar.textContent = '$';
+
+    const x = Math.random() * window.innerWidth;
+    dollar.style.left = `${x}px`;
+
+    const fallDuration = 4000 + Math.random() * 2000;
+    dollar.style.animationDuration = `${fallDuration}ms, 2000ms`;
+    dollar.style.animationDelay = `${delayMs}ms, 0ms`;
+
+    document.body.appendChild(dollar);
+
+    setTimeout(() => {
+      dollar.remove();
+    }, fallDuration + delayMs);
+  }
+</script>
+
+</body>
+</html>
